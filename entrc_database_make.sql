@@ -2,14 +2,20 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.0.0
-sql script that reloads ENTRC database
+version v1.2.4
+sql script that reloads ENTRCruntime database
 */	
 USE entrc_database;
 
 -- checking if old data is on the database 
+drop table if exists ENTRC_IC_LOG;
+drop table if exists ENTRC_IC_ITEM;
+drop table if exists ENTRC_IC_DRAWER;
+drop table if exists ENTRC_IC_CATEGORY;
+drop table if exists PROGRAMCODES;
 drop table if exists PROGRAM_LOG;
 drop table if exists ERROR_LOG;
+drop table if exists CONSOLE;
 drop table if exists RUNTIME;
 drop table if exists ENTRC_API_DATA;
 drop table if exists CONFIGURATION;
@@ -21,11 +27,22 @@ drop table if exists DATA_LOG;
 drop table if exists GRAVEYARD;
 drop table if exists ADMIN_GRAVEYARD;
 drop table if exists ADMIN_PRIVILAGES;
+drop table if exists TT_GENERATED;
+drop table if exists TT_TEMPLATE;
 drop table if exists ANNOUNCEMENT;
 drop table if exists ADMIN_DATA;
 drop table if exists BARCODE_DATA;
+drop table if exists PHOTO_LIB;
+drop table if exists WORKER_DETAILS;
 drop table if exists WORKER;
 
+-- table fro storing data for future use
+CREATE TABLE PROGRAMCODES
+(
+programcodes_id INT PRIMARY KEY AUTO_INCREMENT,
+programcodes_key VARCHAR(50),
+programcodes_value VARCHAR(100)
+);
 -- table for stroing program log
 CREATE TABLE PROGRAM_LOG
 (
@@ -71,6 +88,28 @@ worker_surname VARCHAR(100),
 worker_pin VARCHAR(4),
 worker_position VARCHAR(20)
 );
+-- table for storing worker additional data
+CREATE TABLE WORKER_DETAILS
+(
+worker_details_id INT PRIMARY KEY AUTO_INCREMENT,
+worker_id INT,
+worker_details_salary DOUBLE,
+worker_hours_minimum INT,
+worker_details_mail VARCHAR(100),
+
+CONSTRAINT fk_workerdetails FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id)
+);
+-- table for storing photos
+CREATE TABLE PHOTO_LIB
+(
+photo_lib_id INT PRIMARY KEY AUTO_INCREMENT,
+worker_id INT,
+photo_path VARCHAR(350),
+photo_name VARCHAR(100),
+photo_source BLOB,
+
+CONSTRAINT fk_photolib FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id)
+);
 -- table for storing log for barcodes
 CREATE TABLE BARCODE_DATA
 (
@@ -89,6 +128,40 @@ admin_password VARCHAR(150),
 admin_email VARCHAR(50),
 admin_level INT,
 admin_active INT
+);
+-- table for storing templates for timetable
+CREATE TABLE TT_TEMPLATE
+(
+tt_template_id INT PRIMARY KEY AUTO_INCREMENT,
+admin_id INT,
+tt_template_date TIMESTAMP,
+tt_template_rawdata VARCHAR(550),
+tt_template_name VARCHAR(100),
+CONSTRAINT fk_tttemplate FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
+);
+
+-- table for storing timetables for users
+CREATE TABLE TT_GENERATED
+(
+tt_generated_id INT PRIMARY KEY AUTO_INCREMENT,
+tt_template_id INT,
+admin_id INT,
+worker_id INT,
+tt_generated_date TIMESTAMP,
+tt_generated_month INT,
+tt_generated_desc VARCHAR(100),
+
+CONSTRAINT fk_ttgenerated FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id),
+CONSTRAINT fk_ttgenerated2 FOREIGN KEY (tt_template_id) REFERENCES TT_TEMPLATE(tt_template_id),
+CONSTRAINT fk_ttgenerated3 FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id)
+);
+-- table for storing console data
+CREATE TABLE CONSOLE
+(
+console_id INT PRIMARY KEY AUTO_INCREMENT,
+console_key VARCHAR(40),
+console_value VARCHAR(40),
+console_time TIMESTAMP
 );
 -- table for setting announcments
 CREATE TABLE ANNOUNCEMENT
@@ -135,7 +208,7 @@ data_log_id INT PRIMARY KEY AUTO_INCREMENT,
 admin_id INT,
 data_log_date TIMESTAMP,
 data_log_action VARCHAR(30),
-data_log_desc VARCHAR(200),
+data_log_desc VARCHAR(450),
 
 CONSTRAINT fk_datalog1 FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
 );
@@ -147,7 +220,7 @@ user_log_date TIMESTAMP,
 worker_id INT,
 user_log_action VARCHAR(20),
 user_log_desc VARCHAR(100),
-user_log_photo_src VARCHAR(200),
+user_log_photo_src VARCHAR(350),
 
 CONSTRAINT fk_userlog1 FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id)
 );
@@ -186,6 +259,55 @@ user_message_seen INT,
 CONSTRAINT fk_usermessage1 FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id),
 CONSTRAINT fk_usermessag2 FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
 );
+-- ##########################OBJECTS FOR CREATING ENTRC ITEM COORDINATOR
+-- table for storing item data in ENTRC CATEGORY
+CREATE TABLE ENTRC_IC_CATEGORY
+(
+entrc_ic_category_id INT PRIMARY KEY AUTO_INCREMENT,
+admin_id INT,
+entrc_ic_category_name VARCHAR(100),
+entrc_ic_category_desc VARCHAR(350),
+entrc_ic_category_priority INT,
+
+CONSTRAINT fk_entrciccategory FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
+);
+-- table for storing item data in ENTRC DRAWER
+CREATE TABLE ENTRC_IC_DRAWER
+(
+entrc_ic_drawer_id INT PRIMARY KEY AUTO_INCREMENT,
+admin_id INT,
+entrc_ic_drawer_code VARCHAR(10),
+entrc_ic_drawer_name VARCHAR(100),
+entrc_ic_drawer_desc VARCHAR(150),
+entrc_ic_drawer_place VARCHAR(250),
+
+CONSTRAINT fk_entrcidrawer FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
+);
+-- table for storing item data in ENTRC ITEM
+CREATE TABLE ENTRC_IC_ITEM
+(
+entrc_ic_item_id INT PRIMARY KEY AUTO_INCREMENT,
+entrc_ic_drawer_id INT,
+entrc_ic_category_id int,
+admin_id INT,
+worker_id INT,
+entrc_ic_item_name VARCHAR(100),
+entrc_ic_item_desc VARCHAR(100),
+
+CONSTRAINT fk_entrciitem FOREIGN KEY (entrc_ic_drawer_id) REFERENCES ENTRC_IC_DRAWER(entrc_ic_drawer_id),
+CONSTRAINT fk_entrciitem1 FOREIGN KEY (entrc_ic_category_id ) REFERENCES ENTRC_IC_CATEGORY(entrc_ic_category_id ),
+CONSTRAINT fk_entrciitem2 FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
+);
+-- table for storing log for ENTRC ITEM COORDINATOR
+CREATE TABLE ENTRC_IC_LOG
+(
+entrc_ic_log_id INT PRIMARY KEY AUTO_INCREMENT,
+entrc_ic_log_code VARCHAR(10),
+entrc_ic_log_userid INT,
+entrc_ic_log_objectid INT,
+entrc_ic_log_desc VARCHAR(100),
+entrc_ic_log_time TIMESTAMP
+);
 -- creating empty worker
 INSERT INTO WORKER
 (worker_login,worker_name,worker_surname,worker_pin,worker_position)
@@ -201,3 +323,28 @@ INSERT INTO ADMIN_DATA
 (admin_login,admin_password,admin_level,admin_email,admin_active)
 VALUES
 ("admin","21232f297a57a5a743894a0e4a801fc3",1,"",1);
+-- setting normal startup sequenceprogramcodesprogramcodes
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("CLIENTSTARTUP","NORMAL");
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("PHOTOSAVE","NO");
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("LOGIN","OLD");
+INSERT INTO ENTRC_IC_CATEGORY
+(admin_id,entrc_ic_category_name,entrc_ic_category_desc,entrc_ic_category_priority)
+VALUES
+(1,"no category","default category",1);
+INSERT INTO ENTRC_IC_DRAWER
+(admin_id,entrc_ic_drawer_code,entrc_ic_drawer_name,entrc_ic_drawer_desc,entrc_ic_drawer_place)
+VALUES
+(1,"OUTSIDE","no drawer","item outside any drawer","no place");
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("DATABASEVERSION","124");
