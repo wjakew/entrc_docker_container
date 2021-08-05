@@ -2,7 +2,7 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version v1.3.0
+version v1.3.1
 sql script that reloads ENTRCruntime database
 */	
 USE entrc_database;
@@ -372,6 +372,13 @@ entrc_guard_timesheet INT,
 CONSTRAINT fk_entrcguardentrance FOREIGN KEY (entrc_guard_numberplates_id) REFERENCES ENTRC_GUARD_NUMBERPLATES(entrc_guard_numberplates_id),
 CONSTRAINT fk_entrcguardentrance2 FOREIGN KEY (entrc_guard_timesheet) REFERENCES ENTRC_GUARD_TIMESHEET(entrc_guard_timesheet)
 );
+-- creating table for storing face api data
+CREATE TABLE FACE_API_LOG
+(
+face_api_log_id INT PRIMARY KEY AUTO_INCREMENT,
+face_api_log_code VARCHAR(100),
+face_api_log_desc VARCHAR(300)
+);
 -- creating empty worker
 INSERT INTO WORKER
 (worker_login,worker_name,worker_surname,worker_pin,worker_position)
@@ -415,4 +422,4 @@ VALUES
 INSERT INTO PROGRAMCODES
 (programcodes_key,programcodes_value)
 VALUES
-("DATABASEVERSION","130");
+("DATABASEVERSION","131");
