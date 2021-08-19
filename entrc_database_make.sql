@@ -372,12 +372,14 @@ entrc_guard_timesheet INT,
 CONSTRAINT fk_entrcguardentrance FOREIGN KEY (entrc_guard_numberplates_id) REFERENCES ENTRC_GUARD_NUMBERPLATES(entrc_guard_numberplates_id),
 CONSTRAINT fk_entrcguardentrance2 FOREIGN KEY (entrc_guard_timesheet) REFERENCES ENTRC_GUARD_TIMESHEET(entrc_guard_timesheet)
 );
--- creating table for storing face api data
-CREATE TABLE FACE_API_LOG
+-- table for recoginition api 
+CREATE TABLE REC_API_DATA
 (
-face_api_log_id INT PRIMARY KEY AUTO_INCREMENT,
-face_api_log_code VARCHAR(100),
-face_api_log_desc VARCHAR(300)
+rec_api_data_id INT PRIMARY KEY auto_increment,
+rec_api_data_filename VARCHAR(200),
+rec_api_data_time TIMESTAMP,
+rec_api_data_desc VARCHAR(100),
+rec_api_data_code VARCHAR(50)
 );
 -- creating empty worker
 INSERT INTO WORKER
