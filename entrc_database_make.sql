@@ -9,8 +9,10 @@ USE entrc_database;
 
 -- checking if old data is on the database 
 drop table if exists ENTRC_IC_LOG;
+drop table if exists REC_API_DATA;
+drop table if exists ENTRC_IC_GRAVEYARD;
+drop table if exists ENTRC_IC_ITEM_LABEL;
 drop table if exists ENTRC_IC_ITEM;
-drop table if exists ENTRC_IC_DRAWER_LABEL;
 drop table if exists ENTRC_IC_DRAWER;
 drop table if exists ENTRC_IC_CATEGORY;
 drop table if exists ENTRC_GUARD_ENTRANCE;
@@ -290,16 +292,6 @@ entrc_ic_drawer_place VARCHAR(250),
 
 CONSTRAINT fk_entrcidrawer FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
 );
--- table for storing labels for ENTRC DRAWER
-CREATE TABLE ENTRC_IC_DRAWER_LABEL
-(
-entrc_ic_drawer_label_id INT PRIMARY KEY AUTO_INCREMENT,
-entrc_ic_drawer_id INT,
-entrc_ic_drawer_label_label VARCHAR(20),
-entrc_ic_drawer_label_time TIMESTAMP,
-
-CONSTRAINT fk_entrcicdrawerlabel FOREIGN KEY (entrc_ic_drawer_id) REFERENCES ENTRC_IC_DRAWER(entrc_ic_drawer_id)
-);
 -- table for storing item data in ENTRC ITEM
 CREATE TABLE ENTRC_IC_ITEM
 (
@@ -315,6 +307,16 @@ CONSTRAINT fk_entrciitem FOREIGN KEY (entrc_ic_drawer_id) REFERENCES ENTRC_IC_DR
 CONSTRAINT fk_entrciitem1 FOREIGN KEY (entrc_ic_category_id ) REFERENCES ENTRC_IC_CATEGORY(entrc_ic_category_id ),
 CONSTRAINT fk_entrciitem2 FOREIGN KEY (admin_id) REFERENCES ADMIN_DATA(admin_id)
 );
+-- table for storing labels for ENTRC DRAWER
+CREATE TABLE ENTRC_IC_ITEM_LABEL
+(
+entrc_ic_item_label_id INT PRIMARY KEY AUTO_INCREMENT,
+entrc_ic_item_id INT,
+entrc_ic_item_label_label VARCHAR(20),
+entrc_ic_item_label_time TIMESTAMP,
+
+CONSTRAINT fk_entrcicitemrlabel FOREIGN KEY (entrc_ic_item_id) REFERENCES ENTRC_IC_ITEM(entrc_ic_item_id)
+);
 -- table for storing log for ENTRC ITEM COORDINATOR
 CREATE TABLE ENTRC_IC_LOG
 (
@@ -324,6 +326,14 @@ entrc_ic_log_userid INT,
 entrc_ic_log_objectid INT,
 entrc_ic_log_desc VARCHAR(300),
 entrc_ic_log_time TIMESTAMP
+);
+-- table for locking drawers
+CREATE TABLE ENTRC_IC_GRAVEYARD
+(
+entrc_ic_graveyard INT PRIMARY KEY auto_increment,
+entrc_ic_drawer_id INT,
+entrc_ic_graveyard_time TIMESTAMP,
+CONSTRAINT fk_entrcicgraveyard FOREIGN KEY (entrc_ic_drawer_id) REFERENCES ENTRC_IC_DRAWER(entrc_ic_drawer_id)
 );
 -- ########################## ENTRC GUARD TABLES
 -- table for creating timetables for entrance
@@ -425,3 +435,7 @@ INSERT INTO PROGRAMCODES
 (programcodes_key,programcodes_value)
 VALUES
 ("DATABASEVERSION","131");
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("FACEAPI","NO")
