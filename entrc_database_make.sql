@@ -42,6 +42,8 @@ drop table if exists ADMIN_DATA;
 drop table if exists BARCODE_DATA;
 drop table if exists PHOTO_LIB;
 drop table if exists WORKER_DETAILS;
+drop table if exists GROUP_MEMBERS;
+drop table if exists USER_GROUPS;
 drop table if exists WORKER;
 
 -- table fro storing data for future use
@@ -95,6 +97,21 @@ worker_name VARCHAR(50),
 worker_surname VARCHAR(100),
 worker_pin VARCHAR(4),
 worker_position VARCHAR(20)
+);
+-- table for creating worker groups
+CREATE TABLE USER_GROUPS
+(
+user_groups_id INT PRIMARY KEY AUTO_INCREMENT,
+user_groups_name VARCHAR(30),
+user_groups_desc VARCHAR(250)
+);
+-- table for creating connection between worker and group
+CREATE TABLE GROUP_MEMBERS
+(
+user_groups_id INT,
+worker_id INT,
+CONSTRAINT fk_group_members FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id),
+CONSTRAINT fk_group_members2 FOREIGN KEY (user_groups_id) REFERENCES USER_GROUPS(user_groups_id)
 );
 -- table for storing worker additional data
 CREATE TABLE WORKER_DETAILS
@@ -438,4 +455,12 @@ VALUES
 INSERT INTO PROGRAMCODES
 (programcodes_key,programcodes_value)
 VALUES
-("FACEAPI","NO")
+("FACEAPI","NO");
+INSERT INTO USER_GROUPS
+(user_groups_name,user_groups_desc)
+VALUES
+("EIC","Entrc Item Coordinator users");
+INSERT INTO USER_GROUPS
+(user_groups_name,user_groups_desc)
+VALUES
+("EG","Entrc Guard users");
