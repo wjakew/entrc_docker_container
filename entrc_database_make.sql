@@ -5,6 +5,7 @@ kubawawak@gmail.com
 version v1.3.1
 sql script that reloads ENTRCruntime database
 */	
+CREATE DATABASE IF NOT EXISTS entrc_database;
 USE entrc_database;
 
 -- checking if old data is on the database 
@@ -456,6 +457,10 @@ INSERT INTO PROGRAMCODES
 (programcodes_key,programcodes_value)
 VALUES
 ("FACEAPI","NO");
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("LOCAL_FACE_DETECT","NO");
 INSERT INTO USER_GROUPS
 (user_groups_name,user_groups_desc)
 VALUES
