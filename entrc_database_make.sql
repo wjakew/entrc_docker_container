@@ -104,7 +104,8 @@ CREATE TABLE USER_GROUPS
 (
 user_groups_id INT PRIMARY KEY AUTO_INCREMENT,
 user_groups_name VARCHAR(30),
-user_groups_desc VARCHAR(250)
+user_groups_desc VARCHAR(250),
+object_connected_id INT
 );
 -- table for creating connection between worker and group
 CREATE TABLE GROUP_MEMBERS
@@ -462,10 +463,10 @@ INSERT INTO PROGRAMCODES
 VALUES
 ("LOCAL_FACE_DETECT","NO");
 INSERT INTO USER_GROUPS
-(user_groups_name,user_groups_desc)
+(user_groups_name,user_groups_desc,object_connected_id)
 VALUES
-("EIC","Entrc Item Coordinator users");
+("EIC","Entrc Item Coordinator users",0);
 INSERT INTO USER_GROUPS
-(user_groups_name,user_groups_desc)
+(user_groups_name,user_groups_desc,object_connected_id)
 VALUES
-("EG","Entrc Guard users");
+("EG","Entrc Guard users",0);
