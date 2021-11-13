@@ -462,6 +462,10 @@ INSERT INTO PROGRAMCODES
 (programcodes_key,programcodes_value)
 VALUES
 ("LOCAL_FACE_DETECT","NO");
+INSERT INTO PROGRAMCODES
+(programcodes_key,programcodes_value)
+VALUES
+("API_LINK","BLANK");
 INSERT INTO USER_GROUPS
 (user_groups_name,user_groups_desc,object_connected_id)
 VALUES
